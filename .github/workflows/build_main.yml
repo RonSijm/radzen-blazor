@@ -1,0 +1,26 @@
+name: .NET
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: | 
+            6.x
+            7.x
+            8.x
+            9.x
+      - name: Restore dependencies
+        run: dotnet restore "Radzen.Blazor/Radzen.Blazor.csproj"
+      - name: Build Projects
+        run: dotnet pack "Radzen.Blazor/Radzen.Blazor.csproj" -p:PackageId=RonSijm.Radzen.Blazor -o packages
+      - name: Publish to NuGet
+        env:
+          NUGET_API_KEY: ${{secrets.NUGET_API_KEY}}
+        run: dotnet nuget push "./packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key $NUGET_API_KEY --skip-duplicate
