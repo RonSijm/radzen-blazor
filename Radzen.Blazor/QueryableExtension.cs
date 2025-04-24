@@ -108,6 +108,8 @@ namespace Radzen
         /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string selector = null)
         {
+            selector = $"{selector}";
+
             return (IOrderedQueryable<T>)OrderBy((IQueryable)source, selector);
         }
 
