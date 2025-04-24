@@ -1,0 +1,1 @@
+dotnet pack "Radzen.Blazor/Radzen.Blazor.csproj" -p:PackageId=RonSijm.Radzen.Blazor -o packages

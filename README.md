@@ -1,3 +1,25 @@
+# Fork comments:
+
+This fork removes the dependency on Microsoft.CodeAnalysis.CSharp which adds a 5 MB dll to the blazor application.  
+See: https://forum.radzen.com/t/eliminiate-microsoft-codeanalysis-from-builds/20121/5
+
+To be able to publish this is a nuget, I'm publishing this as `RonSijm.Radzen.Blazor` - The root namespace is still the same: `Radzen.Blazor` - So everything should stay compatible.
+
+The only change you'll have to make, is change the .js import from:
+
+`<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>`
+
+to:
+
+`    <script src="_content/RonSijm.Radzen.Blazor/Radzen.Blazor.js"></script>`
+
+This is due to how packaging works, because the dll is called `RonSijm.Radzen.Blazor` it puts the `Radzen.Blazor.js` file in that path.
+
+Note that because of this - using selectors by strings will no longer work.  
+This sort of syntax: https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor.Tests/ExpressionParserTests.cs
+
+You're adviced to just use a strongly typed syntax anyways, and avoid using string based selectors. If you do need this functionality, stick to the original package.
+
 ![Radzen Blazor Components](https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/wwwroot/images/radzen-blazor-components.png)
 
 Radzen Blazor Components

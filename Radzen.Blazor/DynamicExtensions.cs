@@ -51,8 +51,7 @@ namespace System.Linq.Dynamic.Core
                     .Replace("Guid(", "Guid.Parse(")
                     .Replace(" = ", " == ");
 
-                return !string.IsNullOrEmpty(predicate) ?
-                    source.Where(ExpressionParser.ParsePredicate<T>(predicate, typeLocator)) : source;
+                return source;
             }
             catch (Exception ex)
             {
@@ -71,34 +70,6 @@ namespace System.Linq.Dynamic.Core
             try
             {
                 selector = $"{selector}";
-
-                if (selector.Contains("=>"))
-                {
-                    var identifierName = selector.Split("=>")[0];
-
-                    selector = selector.Replace($"{identifierName}=>", "").Trim();
-
-                    string methodAsc = "OrderBy";
-                    string methodDesc = "OrderByDescending";
-
-                    Expression expression = source.Expression;
-
-                    foreach (var part in selector.Split(","))
-                    {
-                        var lambda = ExpressionParser.ParseLambda<T>($"{identifierName.Trim()} => {part}");
-
-                        expression = Expression.Call(
-                            typeof(Queryable), part.Trim().ToLower().Contains(" desc") ? methodDesc : methodAsc,
-                            new Type[] { source.ElementType, lambda.ReturnType },
-                            expression, Expression.Quote(lambda));
-
-                        methodAsc = "ThenBy";
-                        methodDesc = "ThenByDescending";
-                    }
-
-                    return (IOrderedQueryable<T>)source.Provider.CreateQuery(expression);
-                }
-
                 return (IOrderedQueryable<T>)QueryableExtension.OrderBy((IQueryable)source, selector);
             }
             catch (Exception ex)
@@ -112,23 +83,7 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
         {
-            if (source.ElementType == typeof(object))
-            {
-                var elementType = source.ElementType;
-
-                if (source.Expression is MethodCallExpression methodCall && methodCall.Method.Name == "Cast")
-                {
-                    elementType = methodCall.Arguments[0].Type.GetGenericArguments().FirstOrDefault() ?? typeof(object);
-                }
-                else if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
-                {
-                    elementType = source.FirstOrDefault()?.GetType() ?? typeof(object);
-                }
-
-                return source.Cast(elementType).Select(selector, expression => ExpressionParser.ParseLambda(expression, elementType));
-            }
-
-            return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
+            return source;
         }
 
         /// <summary>
@@ -136,7 +91,7 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select(this IQueryable source, string selector, object[] parameters = null)
         {
-            return source.Select(selector, expression => ExpressionParser.ParseLambda(expression, source.ElementType));
+            return source;
         }
 
         private static IQueryable Select(this IQueryable source, string selector, Func<string, LambdaExpression> lambdaCreator)
